@@ -32,7 +32,7 @@ file_format = opt$out
 if (!platform %in% accepted_platforms) stop('Platform not supported. See README.md for supported platforms.', call.=FALSE)
 
 source('createPedMapFile.r')
-print(createPedMapFile(platform,input_type))
+createPedMapFile(platform,input_type)
 
 system2("sh", c("match_admix.sh", platform),stdout = outputfile, stderr = errorfile)
 

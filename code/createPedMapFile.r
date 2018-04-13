@@ -1,6 +1,10 @@
-# args = commandArgs(trailingOnly = TRUE)
-# platform <- args[1]
-# file_format <- args[2]
+convertXto23 <- function(chr){
+  if (chr == 'X') {
+    return (23)
+  } else {
+    return(chr)
+  }
+}
 createPedMapFile <- function(platform,file_format){
 
   targetdir <- '/data'
@@ -10,9 +14,8 @@ createPedMapFile <- function(platform,file_format){
   options(stringsAsFactors = F)
 
   dir.create(file.path(targetdir, '/tmp'), showWarnings = FALSE)
-  bim <- read.table(sprintf('/source/plink_%s_v2.bim',platform),header=F,stringsAsFactors = F)
   anno <- read.table(sprintf('/source/%s_anno.tsv',platform),header=T,stringsAsFactors = F)
-  bim$chr_pos <- paste(bim[,1],bim[,4],sep = '_')
+  anno[,2] <- sapply(anno[,2],convertXto23)
   anno$chr_pos <- paste(anno[,2],anno[,3],sep = '_')
 
   ### create ped file
@@ -24,11 +27,11 @@ createPedMapFile <- function(platform,file_format){
     fracb <- read.table(file.path(targetdir,f),header = T,stringsAsFactors = F)
     fracb$chr_pos <- paste(fracb[,2],fracb[,3],sep = '_')
 
-    if (sum(!bim$chr_pos %in% fracb$chr_pos) > 0) {
+    if (sum(!anno$chr_pos %in% fracb$chr_pos) > 0) {
       warning(sprintf('For %s: fracB file incomplete.',sample_name))
       next
     }
-    idx <-  match(bim$chr_pos, fracb$chr_pos)
+    idx <-  match(anno$chr_pos, fracb$chr_pos)
     fracb <- fracb[idx,]
     val <- fracb[,4]
 
